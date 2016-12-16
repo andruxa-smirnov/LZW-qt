@@ -6,7 +6,6 @@
 #include <QFile>
 #include <qfiledialog.h>
 #include <QTextStream>
-
 using namespace std;
 
 //string cORe = "d";
@@ -32,11 +31,9 @@ MainWindow::~MainWindow()
 /*
  * Funcion para cargar el archivo original ppm
  */
-
+int tam=0; // tamaño original
 void MainWindow::on_btn_open_img_clicked()
 {
-
-    //QString fileName1 = QFileDialog::getOpenFileName(this,tr("Open Text File"), "", tr("Text Files (*.ppm)"),);
 
     QString fileName1 = QFileDialog::getOpenFileName(
                             this,
@@ -52,7 +49,7 @@ void MainWindow::on_btn_open_img_clicked()
      {
         QString line = in.readLine();
      }
-    int tam=0;
+
 
     ui->lineEdit_1->setText(QFileInfo(file1).filePath());
 
@@ -94,6 +91,19 @@ void MainWindow::on_btn_comprimir_clicked(){
             writeCompressedToFile(compressed, cstrNewFilename);
             cout<<"comprimido"<<endl;
             cout<<"img comprimida: "<<compressed_filename_img<<endl;
+
+            ui->plainTextEdit->setPlainText("Directorio: " +  QString::fromLocal8Bit(compressed_filename_img.c_str()));
+            //ui->label_2->setText("Directorio: " +  QString::fromLocal8Bit(compressed_filename_img.c_str()));
+            QFile file(QString::fromLocal8Bit(compressed_filename_img.c_str()));
+
+            int tama= file.size();
+            ui->label_7->setText("Tamaño :" + QString::number(tama) + " bits " );
+
+
+            /*Porcentaje de compression*/
+
+            ui->label_4->setText("Porcentaje de compresión: "+QString::number(100 -(tama*100.0/tam))+ " %");
+
 }
 
 /*
@@ -101,6 +111,34 @@ void MainWindow::on_btn_comprimir_clicked(){
  */
 
 void MainWindow::on_pushButton_2_clicked(){
+
+
+
+
+    QString fileName1 = QFileDialog::getOpenFileName(
+                            this,
+                            "Select one or more files to open",
+                            "/home",
+                            "Images ( *.lzw)");
+    QFile file1(fileName1);
+     if(!file1.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+     QTextStream in(&file1);
+     while(!in.atEnd())
+     {
+        QString line = in.readLine();
+     }
+
+
+    compressed_filename_img=fileName1.toStdString();
+
+    QFile file(QString::fromLocal8Bit(compressed_filename_img.c_str()));
+    int tam_img= file.size();
+    ui->plainTextEdit->setPlainText(compressed_filename_img.c_str());
+    ui->label_7->setText( QString::number(tam_img) );
+
+
 
 }
 
@@ -126,6 +164,13 @@ void MainWindow::on_pushButton_clicked(){
     writeAllBytes(decompressed, newFilename);
     cout<<"img comprimida:" <<compressed_filename_img<<endl;
     cout<<"descomprimido img: "<<newFilename<<endl;
+
+    ui->lineEdit_2->setText(QString::fromLocal8Bit(newFilename.c_str()));
+
+
+     QFile file2(QString::fromLocal8Bit(newFilename.c_str()));
+
+    ui->label_10->setText("Informacion: \n "+QString::number(file2.size()));
 
 
     QString QnewFilename = QString::fromLocal8Bit(newFilename.c_str());
